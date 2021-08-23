@@ -4,46 +4,55 @@ import java.text.DecimalFormat;
 
 public class Matrix {
 
-    /**
-     * Implement a constructor that creates an empty matrix with a given number of rows
-     * columns (all values in matrix equal 0.0)
-     *
-     * @param row    number of rows
-     * @param column number of columns
-     * @return Returns a new instance of the matrix with the specified parameters
-     */
-    public Matrix(int row, int column) {
-        //TODO: Delete line below and write your own solution;
-        throw new UnsupportedOperationException();
+    private double [][]matrix;
+    private static final String INCORRECT_VALUE = "Incompatible matrix sizes";
+    private static final String INCORRECT_VALUE_ROWS = "Array passed with zero number of rows";
+    private static final String INCORRECT_VALUE_COLUMNS = "Array passed with zero number of columns";
+    
+    public void checkMatrix(int row, int column) throws MatrixException{
+        if ((row<1)|| (column<1))
+            throw new MatrixException(INCORRECT_VALUE);
+    }
+    public boolean checkRows(int row) throws MatrixException{
+        if (row < 1) throw new MatrixException(INCORRECT_VALUE_ROWS);
+        return true;
+    }
+    public boolean checkColumns(int columns) throws MatrixException{
+        if (columns < 1) throw new MatrixException(INCORRECT_VALUE_COLUMNS);
+        return true;
+    }
+    private void checkMatrixForAdd(Matrix matrix) throws MatrixException {
+        if (this.matrix.length!=matrix.rows()||this.matrix[0].length!=matrix.columns())
+            throw new MatrixException(INCORRECT_VALUE);
+    }
+    private void checkMatrixForMulti(Matrix matrix) throws MatrixException {
+        if (this.matrix[0].length!= matrix.rows()) throw new MatrixException(INCORRECT_VALUE);
+    }
+    public Matrix(int row, int column) throws MatrixException {
+        checkMatrix(row,column);
+         for (int i = 0; i < row; i++) {
+            for (int j = 0; j < column; j++)
+                this.matrix[i][j]=0.0;
+           }
     }
 
-    /**
-     * Implement a constructor that creating of matrix based on existing two-dimensional array.
-     *
-     * @param twoDimensionalArray existing two-dimensional array
-     * @return Returns a new instance of the matrix based on existing two-dimensional array
-     * @throws MatrixException if the incoming array with zero number of rows returns the message "Array passed with zero number of rows",
-     *                         if the incoming array with zero number of columns returns the message "Array passed with zero number of columns"
-     */
     public Matrix(double[][] twoDimensionalArray) throws MatrixException {
-        //TODO: Delete line below and write your own solution;
-        throw new UnsupportedOperationException();
+       if (checkRows(twoDimensionalArray.length) && checkColumns(twoDimensionalArray[0].length))
+        for (int i = 0; i < twoDimensionalArray.length; i++) {
+            for (int j = 0; j < twoDimensionalArray[0].length; j++)
+                this.matrix[i][j]=twoDimensionalArray[i][j];
+        }
     }
 
-    /**
-     * @return Returns the number of rows in a matrix
-     */
     public final int rows() {
-        //TODO: Delete line below and write your own solution;
-        throw new UnsupportedOperationException();
+       return this.matrix.length;
     }
 
     /**
      * @return Returns the number of columns in a matrix
      */
     public final int columns() {
-        //TODO: Delete line below and write your own solution;
-        throw new UnsupportedOperationException();
+        return this.matrix[0].length;
     }
 
     /**
@@ -52,8 +61,13 @@ public class Matrix {
      * @return Standard two-dimensional array
      */
     public double[][] twoDimensionalArrayOutOfMatrix() {
-        //TODO: Delete line below and write your own solution;
-        throw new UnsupportedOperationException();
+        double [][]twoDim=new double[matrix.length][matrix[0].length];
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[i].length; j++) {
+                twoDim[i][j]=matrix[i][j];
+            }
+        }
+        return twoDim;
     }
 
     /**
@@ -65,8 +79,8 @@ public class Matrix {
      * @throws MatrixException if index incorrect, returns message "Incompatible matrix sizes"
      */
     public double getValue(int row, int column) throws MatrixException {
-        //TODO: Delete line below and write your own solution;
-        throw new UnsupportedOperationException();
+        checkMatrix(row,column);
+        return this.matrix[row][column];
     }
 
     /**
@@ -78,8 +92,8 @@ public class Matrix {
      * @throws MatrixException if index incorrect, returns message "Incompatible matrix sizes"
      */
     public void setValue(int row, int column, double newValue) throws MatrixException {
-        //TODO: Delete line below and write your own solution;
-        throw new UnsupportedOperationException();
+        checkMatrix(row,column);
+        this.matrix[row][column]=newValue;
     }
 
     /**
@@ -91,10 +105,16 @@ public class Matrix {
      * @throws MatrixException if incompatible matrix sizes, returns message "Incompatible matrix sizes"
      */
     public Matrix addition(Matrix matrix) throws MatrixException {
-        //TODO: Delete line below and write your own solution;
-        throw new UnsupportedOperationException();
+        checkMatrixForAdd(matrix);
+        Matrix newMatrix=new Matrix(this.matrix.length,this.matrix[0].length);
+        for (int i = 0; i < this.matrix.length; i++) {
+            for (int j = 0; j <this.matrix[0].length; j++) {
+                this.matrix[i][j]=this.matrix[i][j]+matrix.getValue(i,j);
+                newMatrix.setValue(i,j,this.matrix[i][j]+matrix.getValue(i,j));
+            }
+        }
+        return newMatrix;
     }
-
     /**
      * Method of matrix's deduction <code>matrix</code> from original.
      * Result in the original matrix
@@ -104,8 +124,15 @@ public class Matrix {
      * @throws MatrixException if incompatible matrix sizes, returns message "Incompatible matrix sizes"
      */
     public Matrix subtraction(final Matrix matrix) throws MatrixException {
-        //TODO: Delete line below and write your own solution;
-        throw new UnsupportedOperationException();
+        checkMatrixForAdd(matrix);
+         Matrix newMatrix=new Matrix(this.matrix.length,this.matrix[0].length);
+        for (int i = 0; i < this.matrix.length; i++) {
+            for (int j = 0; j <this.matrix[0].length; j++) {
+                this.matrix[i][j]=this.matrix[i][j]+matrix.getValue(i,j);
+                newMatrix.setValue(i,j,this.matrix[i][j]-matrix.getValue(i,j));
+            }
+        }
+        return newMatrix;
     }
 
     /**
@@ -117,8 +144,18 @@ public class Matrix {
      * @throws MatrixException if incompatible matrix sizes, returns message "Incompatible matrix sizes"
      */
     public Matrix multiplication(final Matrix matrix) throws MatrixException {
-        //TODO: Delete line below and write your own solution;
-        throw new UnsupportedOperationException();
+        checkMatrix(matrix.rows(),matrix.columns());
+        checkMatrixForMulti(matrix);
+        //Matrix multiM=new Matrix(this.matrix.length, matrix.columns());
+        double[][] multi=new double[this.matrix.length][matrix.columns()];
+        for (int i = 0; i < this.matrix.length; i++) {
+            for (int j = 0; j <matrix.columns() ; j++) {
+                for (int k = 0; k <this.matrix[0].length ; k++) {
+                    multi[i][j]+=this.matrix[i][k]+matrix.getValue(k,j);
+                }
+            }
+        }
+       return new Matrix(multi);
     }
 
     @Override

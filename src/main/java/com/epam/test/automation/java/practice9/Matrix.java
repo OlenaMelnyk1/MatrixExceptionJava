@@ -8,7 +8,6 @@ public class Matrix {
     private static final String INCORRECT_VALUE = "Incompatible matrix sizes";
     private static final String INCORRECT_VALUE_ROWS = "Array passed with zero number of rows";
     private static final String INCORRECT_VALUE_COLUMNS = "Array passed with zero number of columns";
-    private static final String NULL_ARRAY="Array is null";
 
     public void checkMatrix(int row, int column) throws MatrixException {
         if ((row < 1) || (column < 1))
@@ -34,6 +33,10 @@ public class Matrix {
         if (this.rows()!= matrix.rows()) throw new MatrixException(INCORRECT_VALUE);
     }
 
+    private void checkIndMatrix(int i, int j) throws MatrixException{
+        if (i<0 ||j<0 || i>=rows() ||j>=columns()) throw new MatrixException(INCORRECT_VALUE);
+    }
+
     public Matrix(int row, int column) throws MatrixException {
         try {
             checkMatrix(row, column);
@@ -49,7 +52,6 @@ public class Matrix {
     }
 
     public Matrix(double[][] twoDimensionalArray) throws MatrixException {
-        if (twoDimensionalArray==null)throw new NullPointerException(NULL_ARRAY);
         int rows=twoDimensionalArray.length;
         int columns=twoDimensionalArray[0].length;
         if (checkRows(rows) && checkColumns(columns))
@@ -73,7 +75,7 @@ public class Matrix {
 
     public double getValue(int row, int column) throws MatrixException {
         try {
-            checkMatrix(row, column);
+            checkIndMatrix(row, column);
             if ((row>=this.rows())|| (column>=this.columns()))
                 throw new MatrixException(INCORRECT_VALUE);
                 else return this.arrayReal[row][column];
@@ -86,7 +88,7 @@ public class Matrix {
 
     public void setValue(int row, int column, double newValue) throws MatrixException {
         try {
-            checkMatrix(row, column);
+            checkIndMatrix(row, column);
             if ((row>=this.rows())|| (column>=this.columns()))
                 throw new MatrixException(INCORRECT_VALUE);
                 else this.arrayReal[row][column] = newValue;
@@ -98,7 +100,7 @@ public class Matrix {
 
     public Matrix addition(Matrix matrix) throws MatrixException {
         try {
-            if (matrix==null)throw new MatrixException(NULL_ARRAY);
+            if (matrix==null)throw new MatrixException(INCORRECT_VALUE);
             checkMatrix(matrix.columns(),matrix.rows());
             checkMatrixForAdd(matrix);
             Matrix newMatrix = new Matrix(this.rows(), this.columns());
@@ -119,7 +121,7 @@ public class Matrix {
     public Matrix subtraction(final Matrix matrix) throws MatrixException {
 
         try {
-            if (matrix==null)throw new MatrixException(NULL_ARRAY);
+            if (matrix==null)throw new MatrixException(INCORRECT_VALUE);
             checkMatrix(matrix.columns(),matrix.rows());
             checkMatrixForAdd(matrix);
             Matrix newMatrix=new Matrix(this.arrayReal.length,this.arrayReal[0].length);
@@ -149,7 +151,7 @@ public class Matrix {
     public Matrix multiplication(final Matrix matrix) throws MatrixException {
 
             try {
-                if (matrix==null)throw new MatrixException(NULL_ARRAY);
+                if (matrix==null)throw new MatrixException(INCORRECT_VALUE);
                 if ((matrix.rows() < 1) || (matrix.columns() < 1))
                     throw new MatrixException(INCORRECT_VALUE);
                 checkMatrixForMulti(matrix);

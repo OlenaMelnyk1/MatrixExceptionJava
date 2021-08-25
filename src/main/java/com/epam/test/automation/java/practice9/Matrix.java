@@ -8,6 +8,7 @@ public class Matrix {
     private static final String INCORRECT_VALUE = "Incompatible matrix sizes";
     private static final String INCORRECT_VALUE_ROWS = "Array passed with zero number of rows";
     private static final String INCORRECT_VALUE_COLUMNS = "Array passed with zero number of columns";
+    private static final String NULL_ARRAY="Array is null";
 
     public void checkMatrix(int row, int column) throws MatrixException {
         if ((row < 1) || (column < 1))
@@ -25,12 +26,12 @@ public class Matrix {
     }
 
     private void checkMatrixForAdd(Matrix matrix) throws MatrixException {
-        if (this.arrayReal.length != matrix.rows() || this.arrayReal[0].length != matrix.columns())
+        if (this.rows()!= matrix.rows() || this.columns() != matrix.columns())
             throw new MatrixException(INCORRECT_VALUE);
     }
 
     private void checkMatrixForMulti(Matrix matrix) throws MatrixException {
-        if (this.arrayReal[0].length != matrix.rows()) throw new MatrixException(INCORRECT_VALUE);
+        if (this.rows()!= matrix.rows()) throw new MatrixException(INCORRECT_VALUE);
     }
 
     public Matrix(int row, int column) throws MatrixException {
@@ -48,11 +49,13 @@ public class Matrix {
     }
 
     public Matrix(double[][] twoDimensionalArray) throws MatrixException {
-
-        if (checkRows(twoDimensionalArray.length) && checkColumns(twoDimensionalArray[0].length))
-            this.arrayReal = new double[twoDimensionalArray.length][twoDimensionalArray[0].length];
-        for (int i = 0; i < twoDimensionalArray.length; i++) {
-            System.arraycopy(twoDimensionalArray[i], 0, this.arrayReal[i], 0, twoDimensionalArray[0].length);
+        if (twoDimensionalArray==null)throw new NullPointerException(NULL_ARRAY);
+        int rows=twoDimensionalArray.length;
+        int columns=twoDimensionalArray[0].length;
+        if (checkRows(rows) && checkColumns(columns))
+            this.arrayReal = new double[rows][columns];
+        for (int i = 0; i < rows; i++) {
+            System.arraycopy(twoDimensionalArray[i], 0, this.arrayReal[i], 0, columns);
         }
     }
 
@@ -65,17 +68,13 @@ public class Matrix {
     }
 
     public double[][] twoDimensionalArrayOutOfMatrix() {
-        double[][] twoDim = new double[arrayReal.length][arrayReal[0].length];
-        for (int i = 0; i < arrayReal.length; i++) {
-            System.arraycopy(arrayReal[i], 0, twoDim[i], 0, arrayReal[i].length);
-        }
-        return twoDim;
+        return this.arrayReal;
     }
 
     public double getValue(int row, int column) throws MatrixException {
         try {
             checkMatrix(row, column);
-            if ((row>this.arrayReal.length-1)|| (column>this.arrayReal[0].length-1))
+            if ((row>=this.rows())|| (column>=this.columns()))
                 throw new MatrixException(INCORRECT_VALUE);
                 else return this.arrayReal[row][column];
         }
@@ -88,7 +87,7 @@ public class Matrix {
     public void setValue(int row, int column, double newValue) throws MatrixException {
         try {
             checkMatrix(row, column);
-            if ((row>this.arrayReal.length)|| (column>this.arrayReal[0].length))
+            if ((row>=this.rows())|| (column>=this.columns()))
                 throw new MatrixException(INCORRECT_VALUE);
                 else this.arrayReal[row][column] = newValue;
         }
@@ -99,13 +98,14 @@ public class Matrix {
 
     public Matrix addition(Matrix matrix) throws MatrixException {
         try {
+            if (matrix==null)throw new MatrixException(NULL_ARRAY);
             checkMatrix(matrix.columns(),matrix.rows());
             checkMatrixForAdd(matrix);
-            Matrix newMatrix = new Matrix(this.arrayReal.length, this.arrayReal[0].length);
-                for (int i = 0; i < this.arrayReal.length; i++) {
-                    for (int j = 0; j < this.arrayReal[0].length; j++) {
-                        this.arrayReal[i][j] = this.arrayReal[i][j] + matrix.getValue(i, j);
-                        newMatrix.setValue(i, j, this.arrayReal[i][j] + matrix.getValue(i, j));
+            Matrix newMatrix = new Matrix(this.rows(), this.columns());
+                for (int i = 0; i < this.rows(); i++) {
+                    for (int j = 0; j < this.columns(); j++) {
+                        this.setValue(i,j,this.getValue(i,j)+matrix.getValue(i, j));
+                        newMatrix.setValue(i, j, this.getValue(i,j) + matrix.getValue(i, j));
                     }
                 }
                 return newMatrix;
@@ -117,7 +117,9 @@ public class Matrix {
     }
 
     public Matrix subtraction(final Matrix matrix) throws MatrixException {
+
         try {
+            if (matrix==null)throw new MatrixException(NULL_ARRAY);
             checkMatrix(matrix.columns(),matrix.rows());
             checkMatrixForAdd(matrix);
             Matrix newMatrix=new Matrix(this.arrayReal.length,this.arrayReal[0].length);
@@ -131,8 +133,7 @@ public class Matrix {
             else {
                 for (int i = 0; i < this.arrayReal.length; i++) {
                     for (int j = 0; j < this.arrayReal[0].length; j++) {
-                        this.arrayReal[i][j] = this.arrayReal[i][j] + matrix.getValue(i, j);
-                        newMatrix.setValue(i, j, this.arrayReal[i][j] - matrix.getValue(i, j));
+                        newMatrix.setValue(i, j, this.getValue(i,j) - matrix.getValue(i, j));
                     }
                 }
             }
@@ -146,15 +147,17 @@ public class Matrix {
 
 
     public Matrix multiplication(final Matrix matrix) throws MatrixException {
+
             try {
+                if (matrix==null)throw new MatrixException(NULL_ARRAY);
                 if ((matrix.rows() < 1) || (matrix.columns() < 1))
                     throw new MatrixException(INCORRECT_VALUE);
                 checkMatrixForMulti(matrix);
-                    double[][] multi = new double[this.arrayReal.length][matrix.columns()];
-                    for (int i = 0; i < this.arrayReal.length; i++) {
+                    double[][] multi = new double[this.rows()][matrix.columns()];
+                    for (int i = 0; i < this.rows(); i++) {
                         for (int j = 0; j < matrix.columns(); j++) {
-                            for (int k = 0; k < this.arrayReal[0].length; k++) {
-                                multi[i][j] += this.arrayReal[i][k] + matrix.getValue(k, j);
+                            for (int k = 0; k < this.columns(); k++) {
+                                multi[i][j] += this.getValue(i,k) + matrix.getValue(k, j);
                             }
                         }
                     }

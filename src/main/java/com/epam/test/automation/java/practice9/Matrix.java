@@ -10,11 +10,6 @@ public class Matrix {
     private static final String INCORRECT_VALUE_COLUMNS = "Array passed with zero number of columns";
     private static final String INCORRECT_DATA = "Null matrix";
 
-//    private void checkNullMatrix() {
-//        if (this.matrix==null)
-//            throw new NullPointerException(INCORRECT_DATA);
-//    }
-
     public void checkMatrix(int row, int column) throws MatrixException {
         if ((row < 1) || (column < 1))
             throw new MatrixException(INCORRECT_VALUE);
@@ -79,49 +74,82 @@ public class Matrix {
     }
 
     public double getValue(int row, int column) throws MatrixException {
-        checkMatrix(row, column);
-        return this.matrix[row][column];
+        try {
+            checkMatrix(row, column);
+            if ((row>this.matrix.length)|| (column>this.matrix[0].length))
+                throw new MatrixException(INCORRECT_VALUE);
+                else return this.matrix[row][column];
+        }
+        catch (MatrixException e) {
+            System.err.println(INCORRECT_VALUE);
+        }
+        return 0.0;
     }
 
     public void setValue(int row, int column, double newValue) throws MatrixException {
         try {
-            if ((row < 1) || (column < 1))
+            checkMatrix(row, column);
+            if ((row>this.matrix.length)|| (column>this.matrix[0].length))
                 throw new MatrixException(INCORRECT_VALUE);
-            this.matrix[row][column] = newValue;
-        } catch (MatrixException e) {
+                else this.matrix[row][column] = newValue;
+        }
+        catch (MatrixException e) {
             System.err.println(INCORRECT_VALUE);
         }
     }
 
     public Matrix addition(Matrix matrix) throws MatrixException {
-            try {
-                if ((matrix.columns() < 1) || (matrix.rows() < 1))
-                    throw new MatrixException(INCORRECT_VALUE);
-                checkMatrixForAdd(matrix);
-                Matrix newMatrix = new Matrix(this.matrix.length, this.matrix[0].length);
+        try {
+            matrix.checkMatrix(matrix.rows(), matrix.columns());
+            checkMatrixForAdd(matrix);
+            Matrix newMatrix = new Matrix(this.matrix.length, this.matrix[0].length);
+            if ((matrix == null) && (this.matrix == null)) return newMatrix;
+            else if (matrix == null) return new Matrix(this.matrix);
+            else if (this.matrix == null) return matrix;
+            else {
                 for (int i = 0; i < this.matrix.length; i++) {
                     for (int j = 0; j < this.matrix[0].length; j++) {
                         this.matrix[i][j] = this.matrix[i][j] + matrix.getValue(i, j);
                         newMatrix.setValue(i, j, this.matrix[i][j] + matrix.getValue(i, j));
                     }
                 }
-                return newMatrix;
-            } catch (MatrixException e) {
-                System.err.println(INCORRECT_VALUE);
-                return null;
             }
+            return newMatrix;
         }
+        catch (MatrixException e) {
+            System.err.println(INCORRECT_VALUE);
+            return null;
+        }
+    }
 
     public Matrix subtraction(final Matrix matrix) throws MatrixException {
-        checkMatrixForAdd(matrix);
-         Matrix newMatrix=new Matrix(this.matrix.length,this.matrix[0].length);
-        for (int i = 0; i < this.matrix.length; i++) {
-            for (int j = 0; j <this.matrix[0].length; j++) {
-                this.matrix[i][j]=this.matrix[i][j]+matrix.getValue(i,j);
-                newMatrix.setValue(i,j,this.matrix[i][j]-matrix.getValue(i,j));
+        try {
+            matrix.checkMatrix(matrix.rows(), matrix.columns());
+            checkMatrixForAdd(matrix);
+            Matrix newMatrix=new Matrix(this.matrix.length,this.matrix[0].length);
+            if ((matrix == null) && (this.matrix == null)) return newMatrix;
+            else if (matrix == null) return new Matrix(this.matrix);
+            else if (this.matrix == null) {
+                for (int i = 0; i <matrix.rows() ; i++) {
+                    for (int j = 0; j <matrix.columns(); j++) {
+                        newMatrix.setValue(i,j,-matrix.getValue(i,j));
+                    }
+                }
             }
-        }
+            else {
+                for (int i = 0; i < this.matrix.length; i++) {
+                    for (int j = 0; j < this.matrix[0].length; j++) {
+                        this.matrix[i][j] = this.matrix[i][j] + matrix.getValue(i, j);
+                        newMatrix.setValue(i, j, this.matrix[i][j] - matrix.getValue(i, j));
+                    }
+                }
+            }
         return newMatrix;
+    }
+        catch (MatrixException e) {
+            System.err.println(INCORRECT_VALUE);
+            return null;
+        }
     }
 
 
@@ -129,16 +157,18 @@ public class Matrix {
             try {
                 checkMatrix(matrix.rows(), matrix.columns());
                 checkMatrixForMulti(matrix);
-                //Matrix multiM=new Matrix(this.matrix.length, matrix.columns());
-                double[][] multi = new double[this.matrix.length][matrix.columns()];
-                for (int i = 0; i < this.matrix.length; i++) {
-                    for (int j = 0; j < matrix.columns(); j++) {
-                        for (int k = 0; k < this.matrix[0].length; k++) {
-                            multi[i][j] += this.matrix[i][k] + matrix.getValue(k, j);
+                if ((matrix == null) || (this.matrix == null)) return new Matrix(this.matrix.length, matrix.columns());
+                else {
+                    double[][] multi = new double[this.matrix.length][matrix.columns()];
+                    for (int i = 0; i < this.matrix.length; i++) {
+                        for (int j = 0; j < matrix.columns(); j++) {
+                            for (int k = 0; k < this.matrix[0].length; k++) {
+                                multi[i][j] += this.matrix[i][k] + matrix.getValue(k, j);
+                            }
                         }
                     }
+                    return new Matrix(multi);
                 }
-                return new Matrix(multi);
             }
             catch (MatrixException e) {
                 System.err.println(INCORRECT_VALUE);

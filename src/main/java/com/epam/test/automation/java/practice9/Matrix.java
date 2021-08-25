@@ -8,7 +8,6 @@ public class Matrix {
     private static final String INCORRECT_VALUE = "Incompatible matrix sizes";
     private static final String INCORRECT_VALUE_ROWS = "Array passed with zero number of rows";
     private static final String INCORRECT_VALUE_COLUMNS = "Array passed with zero number of columns";
-    private static final String INCORRECT_DATA = "Null matrix";
 
     public void checkMatrix(int row, int column) throws MatrixException {
         if ((row < 1) || (column < 1))
@@ -17,12 +16,12 @@ public class Matrix {
 
     public boolean checkRows(int row) throws MatrixException {
         if (row < 1) throw new MatrixException(INCORRECT_VALUE_ROWS);
-        else return true;
+        return true;
     }
 
     public boolean checkColumns(int columns) throws MatrixException {
         if (columns < 1) throw new MatrixException(INCORRECT_VALUE_COLUMNS);
-        else return true;
+        return true;
     }
 
     private void checkMatrixForAdd(Matrix matrix) throws MatrixException {
@@ -100,8 +99,7 @@ public class Matrix {
 
     public Matrix addition(Matrix matrix) throws MatrixException {
         try {
-            if ((matrix.rows() < 1) || (matrix.columns() < 1))
-                throw new MatrixException(INCORRECT_VALUE);
+            checkMatrix(matrix.columns(),matrix.rows());
             checkMatrixForAdd(matrix);
             Matrix newMatrix = new Matrix(this.arrayReal.length, this.arrayReal[0].length);
                 for (int i = 0; i < this.arrayReal.length; i++) {
@@ -120,13 +118,10 @@ public class Matrix {
 
     public Matrix subtraction(final Matrix matrix) throws MatrixException {
         try {
-            if ((matrix.rows() < 1) || (matrix.columns() < 1))
-                throw new MatrixException(INCORRECT_VALUE);
+            checkMatrix(matrix.columns(),matrix.rows());
             checkMatrixForAdd(matrix);
             Matrix newMatrix=new Matrix(this.arrayReal.length,this.arrayReal[0].length);
-            if ((matrix == null) && (this.arrayReal == null)) return newMatrix;
-            else if (matrix == null) return new Matrix(this.arrayReal);
-            else if (this.arrayReal == null) {
+            if (this.arrayReal == null) {
                 for (int i = 0; i <matrix.rows() ; i++) {
                     for (int j = 0; j <matrix.columns(); j++) {
                         newMatrix.setValue(i,j,-matrix.getValue(i,j));
@@ -155,8 +150,6 @@ public class Matrix {
                 if ((matrix.rows() < 1) || (matrix.columns() < 1))
                     throw new MatrixException(INCORRECT_VALUE);
                 checkMatrixForMulti(matrix);
-                if ((matrix == null) || (this.arrayReal == null)) return new Matrix(this.arrayReal.length, matrix.columns());
-                else {
                     double[][] multi = new double[this.arrayReal.length][matrix.columns()];
                     for (int i = 0; i < this.arrayReal.length; i++) {
                         for (int j = 0; j < matrix.columns(); j++) {
@@ -166,7 +159,6 @@ public class Matrix {
                         }
                     }
                     return new Matrix(multi);
-                }
             }
             catch (MatrixException e) {
                 System.err.println(INCORRECT_VALUE);
